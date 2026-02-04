@@ -2,139 +2,163 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Message Me</title>
+<title>Chat with Abhitav</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
+* { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
 body {
-  margin: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  cursor: pointer;
+  background: black;
 }
 
 /* VIDEO BACKGROUND */
-#bg-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1;
+#bg-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
+
+/* SIDE MUSIC BUTTON */
+#sound-btn {
+  position: fixed; top: 20px; right: 20px; z-index: 10;
+  padding: 10px 14px; font-size: 20px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,0.6); color: #fff; cursor: pointer;
+}
+
+/* TYPING EFFECT CENTER */
+#typing-text {
+  font-size: 32px; font-weight: bold; white-space: nowrap; overflow: hidden;
+  border-right: 3px solid white; padding-right: 3px; margin-top: 60px;
+  text-align: center; display: inline-block;
+}
+
+/* BUBBLE SPAN SMOOTH */
+#typing-text span {
+  opacity: 0;
+  transition: opacity 0.3s ease, color 0.3s ease;
 }
 
 /* CHAT BOX */
 .chat-box {
-  width: 90%;
-  max-width: 380px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 18px;
-  padding: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  animation: pop 0.6s ease;
-}
-
-@keyframes pop {
-  from { transform: scale(0.85); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  width: 80%; max-width: 320px;
+  background: rgba(255,255,255,0);
+  backdrop-filter: blur(0px);
+  border-radius: 12px; padding: 12px;
+  margin-top: 30px;
 }
 
 /* CHAT BUBBLE */
 .bubble {
-  background: #ffffff;
-  color: #000000;
-  padding: 10px 14px;
-  border-radius: 14px 14px 14px 4px;
-  margin-bottom: 12px;
-  width: fit-content;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  animation: slideUp 0.6s ease;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  background: rgba(255,255,255,0);
+  box-shadow: none;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-weight: bold; font-size: 14px;
 }
 
 /* INPUTS */
 input, textarea {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  color: #000000;
-  outline: none;
+  width: 100%; margin-top: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc;
+  font-size: 14px; color: #000; outline: none;
 }
+textarea { resize: none; height: 70px; }
 
-textarea {
-  resize: none;
-  height: 80px;
-}
-
-/* BUTTON */
-button {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border: none;
-  border-radius: 999px;
+/* SEND BUTTON */
+button.send-btn {
+  width: 100%; margin-top: 10px; padding: 10px;
+  border: none; border-radius: 999px;
   background: linear-gradient(135deg, #000000, #333333);
-  color: #ffffff;
-  font-size: 15px;
-  cursor: pointer;
+  color: #fff; font-size: 14px; cursor: pointer;
   transition: transform 0.2s ease;
 }
+button.send-btn:active { transform: scale(0.95); }
 
-button:active {
-  transform: scale(0.95);
-}
-
-/* SUCCESS */
-.success {
-  display: none;
-  text-align: center;
-  margin-top: 10px;
-  color: #000000;
-  font-size: 14px;
-}
+/* SUCCESS MESSAGE */
+.success { display: none; text-align: center; margin-top: 8px; color: #fff; font-size: 14px; }
 </style>
 </head>
 
 <body>
 
 <!-- BACKGROUND VIDEO -->
-<video autoplay muted loop playsinline id="bg-video">
+<video id="bg-video" autoplay muted loop playsinline>
   <source src="bg.mp4" type="video/mp4">
 </video>
 
-<!-- CHAT UI -->
-<div class="chat-box">
-  <div class="bubble">Hey 👋 Drop your message below</div>
+<!-- SIDE MUSIC BUTTON -->
+<button id="sound-btn" onclick="toggleVideoSound(event)">🔇</button>
 
-  <form action="https://formspree.io/f/mjgoqngk" method="POST">
-  	
+<!-- TYPING ANIMATION CENTER -->
+<div id="typing-text"></div>
+
+<!-- CHAT BOX -->
+<div class="chat-box">
+  <div class="bubble">CHAT WITH ABHITAV 🛐:</div>
+
+  <form action="https://formspree.io/f/mjgoqngk" method="POST" onsubmit="showMsg()">
     <input type="text" name="name" placeholder="Your name" required>
-    <textarea name="message" placeholder="Type your message..." required></textarea>
-    <button type="submit">Send Message</button>
+    <textarea name="message" placeholder="ask me question🫴..." required></textarea>
+    <button type="submit" class="send-btn">Send</button>
   </form>
 
   <div class="success" id="success">Message sent ✔</div>
 </div>
 
+<!-- TYPEWRITER SOUND -->
+<audio id="type-sound" src="type.mp3"></audio>
+
 <script>
+// SMOOTH TYPING ANIMATION WITH COLOR CYCLE
+const text = "⛩️WELCOME⛩️";
+const colors = ["white"]; // repeat
+const container = document.getElementById("typing-text");
+const typeAudio = document.getElementById("type-sound");
+let index = 0;
+
+function typeSmooth(){
+  if(index < text.length){
+    const span = document.createElement("span");
+    span.textContent = text[index];
+    span.style.color = colors[index % colors.length];
+    container.appendChild(span);
+
+    // fade in smoothly
+    setTimeout(()=>{ span.style.opacity = 1; }, 50);
+
+    // typing sound
+    typeAudio.currentTime = 0;
+    typeAudio.play().catch(()=>{}); // mobile safe
+
+    index++;
+    setTimeout(typeSmooth, 150); // typing speed
+  }
+}
+
+// auto start
+window.addEventListener("load", ()=>{ typeSmooth(); });
+
+// FORM SUBMIT SUCCESS
 function showMsg() {
   document.getElementById("success").style.display = "block";
+}
+
+// SIDE BUTTON VIDEO MUSIC
+const video = document.getElementById("bg-video");
+const soundBtn = document.getElementById("sound-btn");
+let videoSoundOn = false;
+
+function toggleVideoSound(event){
+  event.stopPropagation(); // prevent typing tap
+  if(videoSoundOn){
+    video.muted = true;
+    videoSoundOn = false;
+    soundBtn.innerHTML = "🔇";
+  } else {
+    video.muted = false;
+    video.play();
+    videoSoundOn = true;
+    soundBtn.innerHTML = "🔊";
+  }
 }
 </script>
 
