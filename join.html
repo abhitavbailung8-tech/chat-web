@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Our Group</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+body {
+  margin:0; padding:0;
+  font-family: 'Orbitron', sans-serif;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  background:black;
+}
+
+#bg-video {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:-1;
+}
+
+h1 {
+  font-size:36px;
+  text-transform:uppercase;
+  font-weight:900;
+  background: linear-gradient(270deg, #ff00ff, #00ffff, #ffea00, #ff00ff);
+  background-size:800% 800%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:gradientShift 6s ease infinite, flicker 1.5s infinite;
+  text-shadow:0 0 5px #ff00ff,0 0 10px #00ffff,0 0 20px #ffea00;
+  margin-bottom:20px;
+  line-height:1.2;
+}
+
+@keyframes gradientShift {
+  0% { background-position:0% 50%; }
+  50% { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
+
+@keyframes flicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { opacity:1; }
+  20%,22%,24%,55% { opacity:0.4; }
+}
+
+p {
+  font-size:18px;
+  color:#00ffff;
+  text-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
+  word-wrap: break-word;
+}
+
+/* BUTTONS */
+a.back, a.contact-btn, button#sound-btn {
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 28px;
+  border-radius:10px;
+  font-weight:bold;
+  font-size:18px;
+  text-decoration:none;
+  color:#111;
+  transition:0.3s;
+  cursor:pointer;
+  border:none;
+}
+
+a.back {
+  background:#00ffff;
+  box-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
+}
+a.back:hover {
+  background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff;
+}
+
+a.contact-btn {
+  background:#ff00ff;
+  box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff;
+  animation:glowPulse 2s infinite alternate;
+  margin-left:10px;
+}
+a.contact-btn:hover {
+  background:#ff33ff; box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff;
+}
+
+button#sound-btn {
+  background:#00ff00;
+  box-shadow:0 0 10px #00ff00,0 0 20px #00ff00;
+  margin-left:10px;
+  animation:glowPulse 2s infinite alternate;
+}
+
+button#sound-btn:hover {
+  background:#00cc00; box-shadow:0 0 20px #00ff00,0 0 40px #00ff00;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff; }
+  50% { box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff; }
+  100% { box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff; }
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND VIDEO -->
+<video id="bg-video" autoplay loop playsinline>
+  <source src="join.mp4" type="video/mp4">
+</video>
+
+<div>
+  <h1>Welcome to Our Group!</h1>
+  <p>Contact us at: +91 12345 67890</p>
+  <a class="back" href="index.html">Back to Home</a>
+  <a class="contact-btn" href="tel:+911234567890">Call Now</a>
+  <button id="sound-btn">🔊 Sound</button>
+</div>
+
+<script>
+// SOUND TOGGLE
+const video = document.getElementById("bg-video");
+const soundBtn = document.getElementById("sound-btn");
+let soundOn = false;
+
+soundBtn.addEventListener("click", ()=>{
+  if(soundOn){
+    video.muted = true;
+    soundOn = false;
+    soundBtn.textContent = "🔊 Sound";
+  } else {
+    video.muted = false;
+    video.play();
+    soundOn = true;
+    soundBtn.textContent = "🔇 Mute";
+  }
+});
+</script>
+
+</body>
+</html>

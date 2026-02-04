@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Survive</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
 body {
   margin:0; padding:0;
   font-family: 'Orbitron', sans-serif;
@@ -13,7 +15,6 @@ body {
   line-height:1.6;
   overflow-x:hidden;
 }
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
 
 .container {
   max-width:800px;
@@ -54,42 +55,65 @@ img {
   margin:0 auto 30px auto;
   font-size:20px;
   word-wrap: break-word;
-  white-space: normal; /* allow wrapping */
+  white-space: normal;
   text-align:center;
 }
 #animated-text span {
-  display:inline; /* letters wrap properly */
+  display:inline;
   opacity:0;
   color:#00ffff;
   text-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
   animation:letterFade 0.5s forwards;
 }
 
-/* BACK BUTTON */
-a.back {
+/* BUTTONS */
+a.back, a.join-btn {
   display:inline-block;
   margin-top:20px;
-  padding:12px 24px;
-  background:#00ffff;
-  color:#111;
-  text-decoration:none;
-  border-radius:8px;
+  padding:12px 28px;
+  border-radius:10px;
   font-weight:bold;
+  font-size:18px;
+  text-decoration:none;
+  color:#111;
   transition:0.3s;
+}
+
+a.back {
+  background:#00ffff;
   box-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
 }
-a.back:hover { background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff; }
+a.back:hover { 
+  background:#00aac0; 
+  box-shadow:0 0 10px #00ffff,0 0 20px #00ffff; 
+}
+
+a.join-btn {
+  background:#ff00ff;
+  box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff;
+  animation:glowPulse 2s infinite alternate;
+}
+a.join-btn:hover {
+  background:#ff33ff;
+  box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff; }
+  50% { box-shadow:0 0 20px #ff00ff,0 0 40px #ff00ff; }
+  100% { box-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff; }
+}
 
 /* CONTACT FORM */
 #contact-form {
   max-width:400px;
   margin:50px auto 30px auto;
-  background:rgba(0,255,255,0.1);
+  background:rgba(255,0,255,0.1);
   padding:20px;
   border-radius:12px;
   backdrop-filter:blur(3px);
   text-align:center;
-  box-shadow:0 0 10px #00ffff;
+  box-shadow:0 0 10px #ff00ff;
 }
 #contact-form input, #contact-form textarea {
   width:100%;
@@ -102,17 +126,17 @@ a.back:hover { background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff;
 #contact-form button {
   padding:10px 20px;
   margin-top:10px;
-  background:#00ffff;
+  background:#ff00ff;
   color:#111;
   border:none;
   border-radius:8px;
   font-weight:bold;
   cursor:pointer;
-  box-shadow:0 0 5px #00ffff;
+  box-shadow:0 0 5px #ff00ff;
 }
-#contact-form button:hover { background:#00aac0; box-shadow:0 0 10px #00ffff; }
+#contact-form button:hover { background:#ff33ff; box-shadow:0 0 10px #ff00ff; }
 
-.success { display:none; margin-top:10px; color:#00ffff; font-weight:bold; }
+.success { display:none; margin-top:10px; color:#ff00ff; font-weight:bold; }
 
 /* ANIMATION KEYFRAMES */
 @keyframes fadeSlide { to { opacity:1; transform:translateY(0); } }
@@ -124,18 +148,18 @@ a.back:hover { background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff;
 
 <div class="container">
   <h1>Survive is …</h1>
-
   <img src="survive.jpg" alt="Survive Image">
-
   <p id="animated-text"></p>
-
+  
+  <!-- BUTTONS -->
   <a class="back" href="index.html">Back to Home</a>
+  <a class="join-btn" href="join.html" target="_blank">Join Our Group</a>
 </div>
 
 <!-- CONTACT FORM -->
 <div id="contact-form">
-  <form action="https://formspree.io/f/mjgoqngk" method="POST" onsubmit="showSuccess(event)">
-    <input type="text" name="name" placeholder="Your Name" required>
+  <form action="https://formspree.io/f/mgozgqld" method="POST" onsubmit="showSuccess(event)">
+    <input type="text" name="_replyto" placeholder="Your Name" required>
     <input type="email" name="email" placeholder="Your Email" required>
     <textarea name="message" placeholder="Your Message" required></textarea>
     <button type="submit">Send Message</button>
@@ -147,18 +171,16 @@ a.back:hover { background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff;
 <audio id="type-sound" src="type.mp3"></audio>
 
 <script>
-// Paragraph text with proper spaces
-const paragraph = "SURVIVE INCLUDES SKILLS SKILLS LIKE PHOTO EDITING, VIDEO EDITING, GRAPHIC DESIGN, ANIMATION AND CREATIVE DIGITAL CONTENT CREATION. APPLY YOUR SKILLS TO REAL PROJECTS AND EXPLORE FUTURISTIC DIGITAL DESIGN!";
+// Paragraph typing animation with sound
+const paragraph = "Survive includes skills like Photo Editing, Video Editing, Graphic Design, Animation and creative digital content creation. Apply your skills to real projects and explore futuristic digital design!";
 const container = document.getElementById("animated-text");
 const typeAudio = document.getElementById("type-sound");
 
-// Letter-by-letter animation with proper wrap
 paragraph.split("").forEach((char,i)=>{
   const span = document.createElement("span");
-  span.textContent = char; // normal space, allow wrap
+  span.textContent = char;
   span.style.animationDelay = (i*0.05)+"s";
   container.appendChild(span);
-  // play typing sound for each letter
   setTimeout(()=>{ typeAudio.currentTime=0; typeAudio.play().catch(()=>{}); }, i*50);
 });
 

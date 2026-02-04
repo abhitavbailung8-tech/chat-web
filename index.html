@@ -5,13 +5,19 @@
 <title>Chat with Abhitav</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-html, body { margin:0; padding:0; scroll-behavior:smooth; font-family:system-ui, sans-serif; background:black; }
+html, body { margin:0; padding:0; scroll-behavior:smooth; font-family:system-ui, sans-serif; background:black; overflow-x:hidden; }
+
+/* VIDEO SECTION */
 #video-section { position:relative; width:100%; overflow:hidden; }
 #video-section video { width:100%; height:auto; max-height:100vh; object-fit:cover; display:block; }
 #sound-btn { position:fixed; top:20px; right:20px; z-index:10; padding:10px 14px; font-size:20px; border-radius:50%; border:none; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer; }
-#typing-text { font-size:32px; font-weight:bold; white-space:nowrap; overflow:hidden; border-right:3px solid white; padding-right:3px; text-align:center; display:block; position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:5; }
-#typing-text span { opacity:0; transition:opacity 0.3s ease,color 0.3s ease; }
-.chat-box { width:80%; max-width:320px; background:rgba(255,255,255,0.1); backdrop-filter:blur(3px); border-radius:12px; padding:12px; margin:20px auto 60px auto; z-index:5; position:relative; }
+
+/* TYPING TEXT - NO BLINKING CURSOR */
+#typing-text { font-size:36px; font-weight:bold; white-space:nowrap; overflow:hidden; padding-right:3px; text-align:center; display:block; position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:5; }
+#typing-text span { opacity:0; color:white; transition: opacity 0.6s ease; }
+
+/* CHAT BOX */
+.chat-box { width:90%; max-width:360px; background:rgba(255,255,255,0.1); backdrop-filter:blur(3px); border-radius:12px; padding:12px; margin:20px auto 60px auto; z-index:5; position:relative; }
 .bubble { background:rgba(255,255,255,0.1); color:#fff; padding:8px 12px; border-radius:12px; margin-bottom:10px; font-weight:bold; font-size:14px; }
 input, textarea { width:100%; margin-top:8px; padding:8px 10px; border-radius:8px; border:1px solid #ccc; font-size:14px; color:#000; outline:none; }
 textarea { resize:none; height:70px; }
@@ -19,12 +25,36 @@ button.send-btn { width:100%; margin-top:10px; padding:10px; border:none; border
 button.send-btn:active { transform:scale(0.95); }
 .success { display:none; text-align:center; margin-top:8px; color:#fff; font-size:14px; }
 
-/* INTRO SECTION WITH BUTTON */
-#intro-section { width:100%; background:black; color:white; padding:100px 20px; text-align:center; }
+/* INTRO SECTION */
+#intro-section { width:100%; background:black; color:white; padding:100px 20px; text-align:center; box-sizing:border-box; }
 #intro-section h2 { font-size:28px; margin-bottom:20px; font-weight:bold; }
-#intro-section p { font-size:18px; max-width:700px; margin:0 auto; line-height:1.6; }
-#intro-section .survive-btn { display:inline-block; margin-bottom:20px; padding:12px 24px; background:blue; color:white; text-decoration:none; font-weight:bold; border-radius:8px; transition:0.3s; }
-#intro-section .survive-btn:hover { background:#0056b3; }
+#intro-section p { font-size:18px; max-width:700px; margin:0 auto; line-height:1.6; text-align:center; }
+
+/* OUR SURVIVE BUTTON SKY BLUE NEON */
+#intro-section .survive-btn {
+  display:inline-block;
+  margin-bottom:20px;
+  padding:14px 28px;
+  background:#00BFFF; /* sky blue */
+  color:#111;
+  text-decoration:none;
+  font-weight:bold;
+  border-radius:10px;
+  font-size:20px;
+  transition:0.3s;
+  box-shadow:0 0 10px #00BFFF,0 0 20px #00BFFF,0 0 30px #00BFFF;
+  animation:glowPulse 2s infinite alternate;
+}
+#intro-section .survive-btn:hover {
+  background:#1ECFFF;
+  box-shadow:0 0 20px #00BFFF,0 0 30px #00BFFF,0 0 50px #00BFFF;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow:0 0 10px #00BFFF,0 0 20px #00BFFF,0 0 30px #00BFFF; }
+  50% { box-shadow:0 0 20px #00BFFF,0 0 40px #00BFFF,0 0 60px #00BFFF; }
+  100% { box-shadow:0 0 10px #00BFFF,0 0 20px #00BFFF,0 0 30px #00BFFF; }
+}
 </style>
 </head>
 <body>
@@ -61,37 +91,48 @@ button.send-btn:active { transform:scale(0.95); }
 <audio id="type-sound" src="type.mp3"></audio>
 
 <script>
-// TYPING ANIMATION
-const text="⛩️WELCOME⛩️";
-const colors=["white"];
-const container=document.getElementById("typing-text");
-const typeAudio=document.getElementById("type-sound");
-let index=0;
-function typeSmooth(){
-  if(index<text.length){
-    const span=document.createElement("span");
-    span.textContent=text[index];
-    span.style.color=colors[index%colors.length];
+// SMOOTH FADE-IN TYPING ANIMATION WITHOUT BLINKING CURSOR
+const text = "⛩️WELCOME⛩️";
+const container = document.getElementById("typing-text");
+const typeAudio = document.getElementById("type-sound");
+let index = 0;
+
+function typeSmooth() {
+  if (index < text.length) {
+    const span = document.createElement("span");
+    span.textContent = text[index];
+    span.style.opacity = 0;
+    span.style.transition = "opacity 0.6s ease"; // smooth fade
     container.appendChild(span);
-    setTimeout(()=>{ span.style.opacity=1; },50);
-    typeAudio.currentTime=0; typeAudio.play().catch(()=>{});
-    index++; setTimeout(typeSmooth,150);
+
+    // Fade-in animation
+    setTimeout(() => { span.style.opacity = 1; }, 50);
+
+    // Typing sound
+    typeAudio.currentTime = 0;
+    typeAudio.play().catch(()=>{});
+
+    index++;
+    const delay = 100 + Math.random()*80; // slight random delay
+    setTimeout(typeSmooth, delay);
   }
 }
-window.addEventListener("load",()=>{ typeSmooth(); });
+
+window.addEventListener("load", ()=>{ typeSmooth(); });
 
 // FORM SUBMIT SUCCESS
 function showMsg(){ document.getElementById("success").style.display="block"; }
 
 // VIDEO SOUND BUTTON
-const video=document.querySelector("#video-section video");
-const soundBtn=document.getElementById("sound-btn");
-let videoSoundOn=false;
+const video = document.querySelector("#video-section video");
+const soundBtn = document.getElementById("sound-btn");
+let videoSoundOn = false;
 function toggleVideoSound(event){
   event.stopPropagation();
   if(videoSoundOn){ video.muted=true; videoSoundOn=false; soundBtn.innerHTML="🔇"; }
   else{ video.muted=false; video.play(); videoSoundOn=true; soundBtn.innerHTML="🔊"; }
 }
 </script>
+
 </body>
 </html>
