@@ -4,163 +4,94 @@
 <meta charset="UTF-8">
 <title>Chat with Abhitav</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-* { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
-body {
-  margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  cursor: pointer;
-  background: black;
-}
+html, body { margin:0; padding:0; scroll-behavior:smooth; font-family:system-ui, sans-serif; background:black; }
+#video-section { position:relative; width:100%; overflow:hidden; }
+#video-section video { width:100%; height:auto; max-height:100vh; object-fit:cover; display:block; }
+#sound-btn { position:fixed; top:20px; right:20px; z-index:10; padding:10px 14px; font-size:20px; border-radius:50%; border:none; background:rgba(0,0,0,0.6); color:#fff; cursor:pointer; }
+#typing-text { font-size:32px; font-weight:bold; white-space:nowrap; overflow:hidden; border-right:3px solid white; padding-right:3px; text-align:center; display:block; position:absolute; top:20px; left:50%; transform:translateX(-50%); z-index:5; }
+#typing-text span { opacity:0; transition:opacity 0.3s ease,color 0.3s ease; }
+.chat-box { width:80%; max-width:320px; background:rgba(255,255,255,0.1); backdrop-filter:blur(3px); border-radius:12px; padding:12px; margin:20px auto 60px auto; z-index:5; position:relative; }
+.bubble { background:rgba(255,255,255,0.1); color:#fff; padding:8px 12px; border-radius:12px; margin-bottom:10px; font-weight:bold; font-size:14px; }
+input, textarea { width:100%; margin-top:8px; padding:8px 10px; border-radius:8px; border:1px solid #ccc; font-size:14px; color:#000; outline:none; }
+textarea { resize:none; height:70px; }
+button.send-btn { width:100%; margin-top:10px; padding:10px; border:none; border-radius:999px; background:linear-gradient(135deg,#000,#333); color:#fff; font-size:14px; cursor:pointer; transition:transform 0.2s ease; }
+button.send-btn:active { transform:scale(0.95); }
+.success { display:none; text-align:center; margin-top:8px; color:#fff; font-size:14px; }
 
-/* VIDEO BACKGROUND */
-#bg-video { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }
-
-/* SIDE MUSIC BUTTON */
-#sound-btn {
-  position: fixed; top: 20px; right: 20px; z-index: 10;
-  padding: 10px 14px; font-size: 20px; border-radius: 50%;
-  border: none; background: rgba(0,0,0,0.6); color: #fff; cursor: pointer;
-}
-
-/* TYPING EFFECT CENTER */
-#typing-text {
-  font-size: 32px; font-weight: bold; white-space: nowrap; overflow: hidden;
-  border-right: 3px solid white; padding-right: 3px; margin-top: 60px;
-  text-align: center; display: inline-block;
-}
-
-/* BUBBLE SPAN SMOOTH */
-#typing-text span {
-  opacity: 0;
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-
-/* CHAT BOX */
-.chat-box {
-  width: 80%; max-width: 320px;
-  background: rgba(255,255,255,0);
-  backdrop-filter: blur(0px);
-  border-radius: 12px; padding: 12px;
-  margin-top: 30px;
-}
-
-/* CHAT BUBBLE */
-.bubble {
-  background: rgba(255,255,255,0);
-  box-shadow: none;
-  color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  font-weight: bold; font-size: 14px;
-}
-
-/* INPUTS */
-input, textarea {
-  width: 100%; margin-top: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid #ccc;
-  font-size: 14px; color: #000; outline: none;
-}
-textarea { resize: none; height: 70px; }
-
-/* SEND BUTTON */
-button.send-btn {
-  width: 100%; margin-top: 10px; padding: 10px;
-  border: none; border-radius: 999px;
-  background: linear-gradient(135deg, #000000, #333333);
-  color: #fff; font-size: 14px; cursor: pointer;
-  transition: transform 0.2s ease;
-}
-button.send-btn:active { transform: scale(0.95); }
-
-/* SUCCESS MESSAGE */
-.success { display: none; text-align: center; margin-top: 8px; color: #fff; font-size: 14px; }
+/* INTRO SECTION WITH BUTTON */
+#intro-section { width:100%; background:black; color:white; padding:100px 20px; text-align:center; }
+#intro-section h2 { font-size:28px; margin-bottom:20px; font-weight:bold; }
+#intro-section p { font-size:18px; max-width:700px; margin:0 auto; line-height:1.6; }
+#intro-section .survive-btn { display:inline-block; margin-bottom:20px; padding:12px 24px; background:blue; color:white; text-decoration:none; font-weight:bold; border-radius:8px; transition:0.3s; }
+#intro-section .survive-btn:hover { background:#0056b3; }
 </style>
 </head>
-
 <body>
 
-<!-- BACKGROUND VIDEO -->
-<video id="bg-video" autoplay muted loop playsinline>
-  <source src="bg.mp4" type="video/mp4">
-</video>
-
-<!-- SIDE MUSIC BUTTON -->
-<button id="sound-btn" onclick="toggleVideoSound(event)">🔇</button>
-
-<!-- TYPING ANIMATION CENTER -->
-<div id="typing-text"></div>
+<!-- VIDEO SECTION -->
+<section id="video-section">
+  <video autoplay loop muted playsinline>
+    <source src="bg.mp4" type="video/mp4">
+  </video>
+  <div id="typing-text"></div>
+  <button id="sound-btn" onclick="toggleVideoSound(event)">🔇</button>
+</section>
 
 <!-- CHAT BOX -->
 <div class="chat-box">
-  <div class="bubble">CHAT WITH ABHITAV 🛐:</div>
-
+  <div class="bubble">Send me a message below:</div>
   <form action="https://formspree.io/f/mjgoqngk" method="POST" onsubmit="showMsg()">
     <input type="text" name="name" placeholder="Your name" required>
-    <textarea name="message" placeholder="ask me question🫴..." required></textarea>
-    <button type="submit" class="send-btn">Send</button>
+    <textarea name="message" placeholder="Type your message..." required></textarea>
+    <button type="submit" class="send-btn">Send Message</button>
   </form>
-
   <div class="success" id="success">Message sent ✔</div>
 </div>
 
-<!-- TYPEWRITER SOUND -->
+<!-- ABOUT ME SECTION -->
+<section id="intro-section">
+  <a href="survive.html" class="survive-btn">Our Survive</a>
+  <h2>About Me</h2>
+  <p>
+    Hi, I am <strong>Abhitav Bailung</strong>. I am passionate about web development, animation, and interactive projects. I love creating websites that are visually appealing and functional. In my free time, I explore new technologies, work on creative coding projects, and aim to combine creativity with coding skills to build engaging experiences. Welcome to my personal space!
+  </p>
+</section>
+
 <audio id="type-sound" src="type.mp3"></audio>
 
 <script>
-// SMOOTH TYPING ANIMATION WITH COLOR CYCLE
-const text = "⛩️WELCOME⛩️";
-const colors = ["white"]; // repeat
-const container = document.getElementById("typing-text");
-const typeAudio = document.getElementById("type-sound");
-let index = 0;
-
+// TYPING ANIMATION
+const text="⛩️WELCOME⛩️";
+const colors=["white"];
+const container=document.getElementById("typing-text");
+const typeAudio=document.getElementById("type-sound");
+let index=0;
 function typeSmooth(){
-  if(index < text.length){
-    const span = document.createElement("span");
-    span.textContent = text[index];
-    span.style.color = colors[index % colors.length];
+  if(index<text.length){
+    const span=document.createElement("span");
+    span.textContent=text[index];
+    span.style.color=colors[index%colors.length];
     container.appendChild(span);
-
-    // fade in smoothly
-    setTimeout(()=>{ span.style.opacity = 1; }, 50);
-
-    // typing sound
-    typeAudio.currentTime = 0;
-    typeAudio.play().catch(()=>{}); // mobile safe
-
-    index++;
-    setTimeout(typeSmooth, 150); // typing speed
+    setTimeout(()=>{ span.style.opacity=1; },50);
+    typeAudio.currentTime=0; typeAudio.play().catch(()=>{});
+    index++; setTimeout(typeSmooth,150);
   }
 }
-
-// auto start
-window.addEventListener("load", ()=>{ typeSmooth(); });
+window.addEventListener("load",()=>{ typeSmooth(); });
 
 // FORM SUBMIT SUCCESS
-function showMsg() {
-  document.getElementById("success").style.display = "block";
-}
+function showMsg(){ document.getElementById("success").style.display="block"; }
 
-// SIDE BUTTON VIDEO MUSIC
-const video = document.getElementById("bg-video");
-const soundBtn = document.getElementById("sound-btn");
-let videoSoundOn = false;
-
+// VIDEO SOUND BUTTON
+const video=document.querySelector("#video-section video");
+const soundBtn=document.getElementById("sound-btn");
+let videoSoundOn=false;
 function toggleVideoSound(event){
-  event.stopPropagation(); // prevent typing tap
-  if(videoSoundOn){
-    video.muted = true;
-    videoSoundOn = false;
-    soundBtn.innerHTML = "🔇";
-  } else {
-    video.muted = false;
-    video.play();
-    videoSoundOn = true;
-    soundBtn.innerHTML = "🔊";
-  }
+  event.stopPropagation();
+  if(videoSoundOn){ video.muted=true; videoSoundOn=false; soundBtn.innerHTML="🔇"; }
+  else{ video.muted=false; video.play(); videoSoundOn=true; soundBtn.innerHTML="🔊"; }
 }
 </script>
-
 </body>
 </html>

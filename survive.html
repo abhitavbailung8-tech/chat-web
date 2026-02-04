@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Survive</title>
+<style>
+body {
+  margin:0; padding:0;
+  font-family: 'Orbitron', sans-serif;
+  background:#111;
+  color:white;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+.container {
+  max-width:800px;
+  margin:50px auto;
+  padding:20px;
+  text-align:center;
+}
+
+/* FUTURISTIC TITLE */
+h1 {
+  font-size:48px;
+  font-weight:900;
+  color:#00ffff;
+  text-transform:uppercase;
+  margin-bottom:20px;
+  letter-spacing:2px;
+  opacity:0;
+  transform:translateY(-50px);
+  animation:fadeSlide 1s forwards;
+  text-shadow:0 0 5px #00ffff,0 0 10px #00ffff,0 0 20px #00ffff,0 0 40px #00ffff;
+}
+
+/* IMAGE */
+img {
+  max-width:100%;
+  border-radius:12px;
+  margin-bottom:20px;
+  opacity:0;
+  transform:translateY(50px);
+  animation:fadeSlide 1s forwards;
+  animation-delay:1s;
+}
+
+/* PARAGRAPH */
+#animated-text {
+  display:block;
+  max-width:700px;
+  margin:0 auto 30px auto;
+  font-size:20px;
+  word-wrap: break-word;
+  white-space: normal; /* allow wrapping */
+  text-align:center;
+}
+#animated-text span {
+  display:inline; /* letters wrap properly */
+  opacity:0;
+  color:#00ffff;
+  text-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
+  animation:letterFade 0.5s forwards;
+}
+
+/* BACK BUTTON */
+a.back {
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 24px;
+  background:#00ffff;
+  color:#111;
+  text-decoration:none;
+  border-radius:8px;
+  font-weight:bold;
+  transition:0.3s;
+  box-shadow:0 0 5px #00ffff,0 0 10px #00ffff;
+}
+a.back:hover { background:#00aac0; box-shadow:0 0 10px #00ffff,0 0 20px #00ffff; }
+
+/* CONTACT FORM */
+#contact-form {
+  max-width:400px;
+  margin:50px auto 30px auto;
+  background:rgba(0,255,255,0.1);
+  padding:20px;
+  border-radius:12px;
+  backdrop-filter:blur(3px);
+  text-align:center;
+  box-shadow:0 0 10px #00ffff;
+}
+#contact-form input, #contact-form textarea {
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:8px;
+  border:none;
+  font-size:14px;
+}
+#contact-form button {
+  padding:10px 20px;
+  margin-top:10px;
+  background:#00ffff;
+  color:#111;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 0 5px #00ffff;
+}
+#contact-form button:hover { background:#00aac0; box-shadow:0 0 10px #00ffff; }
+
+.success { display:none; margin-top:10px; color:#00ffff; font-weight:bold; }
+
+/* ANIMATION KEYFRAMES */
+@keyframes fadeSlide { to { opacity:1; transform:translateY(0); } }
+@keyframes letterFade { to { opacity:1; } }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Survive is …</h1>
+
+  <img src="survive.jpg" alt="Survive Image">
+
+  <p id="animated-text"></p>
+
+  <a class="back" href="index.html">Back to Home</a>
+</div>
+
+<!-- CONTACT FORM -->
+<div id="contact-form">
+  <form action="https://formspree.io/f/mjgoqngk" method="POST" onsubmit="showSuccess(event)">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="message" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+    <div class="success" id="success">Message sent ✔</div>
+  </form>
+</div>
+
+<!-- TYPING SOUND -->
+<audio id="type-sound" src="type.mp3"></audio>
+
+<script>
+// Paragraph text with proper spaces
+const paragraph = "SURVIVE INCLUDES SKILLS SKILLS LIKE PHOTO EDITING, VIDEO EDITING, GRAPHIC DESIGN, ANIMATION AND CREATIVE DIGITAL CONTENT CREATION. APPLY YOUR SKILLS TO REAL PROJECTS AND EXPLORE FUTURISTIC DIGITAL DESIGN!";
+const container = document.getElementById("animated-text");
+const typeAudio = document.getElementById("type-sound");
+
+// Letter-by-letter animation with proper wrap
+paragraph.split("").forEach((char,i)=>{
+  const span = document.createElement("span");
+  span.textContent = char; // normal space, allow wrap
+  span.style.animationDelay = (i*0.05)+"s";
+  container.appendChild(span);
+  // play typing sound for each letter
+  setTimeout(()=>{ typeAudio.currentTime=0; typeAudio.play().catch(()=>{}); }, i*50);
+});
+
+// Form submit success
+function showSuccess(e){
+  e.preventDefault();
+  document.getElementById("success").style.display="block";
+  e.target.reset();
+}
+</script>
+
+</body>
+</html>
