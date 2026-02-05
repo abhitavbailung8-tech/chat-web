@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Neon Digital Trading Simulator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap');
+
+:root{
+  --bg:#0a0f2e;
+  --panel:#10172ecc;
+  --neon:#00f6ff;
+  --green:#00ff9c;
+  --red:#ff3b6f;
+}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#0a123a,#03040b);
+  font-family:'Orbitron',Arial,sans-serif;
+  overflow:hidden;
+}
+
+#hud{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-around;
+  align-items:center;
+  background:var(--panel);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid #00f6ff44;
+  box-shadow:0 0 40px #00f6ff44;
+  padding:14px 20px;
+  z-index:10;
+}
+
+.hud-section{
+  display:flex;
+  align-items:center;
+  margin:6px 12px;
+  flex-wrap:wrap;
+  color:#00f6ff;
+  text-shadow: 0 0 8px #00f6ff, 0 0 16px #00f6ff88;
+  font-weight:600;
+}
+
+.hud-section input{
+  width:80px;
+  border-radius:12px;
+  border:none;
+  padding:6px;
+  text-align:right;
+  font-size:14px;
+  margin-left:8px;
+  background:#001529;
+  color:#00f6ff;
+  box-shadow:0 0 8px #00f6ff44 inset;
+}
+
+.hud-section button{
+  margin-left:8px;
+  background:linear-gradient(135deg,#00f6ff,#7a7cff);
+  border:none;
+  color:#001;
+  padding:10px 18px;
+  border-radius:25px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 0 25px #00f6ff88, 0 0 40px #00f6ff44 inset;
+  transition:0.2s;
+}
+
+.hud-section button:hover{
+  transform:scale(1.08);
+  box-shadow:0 0 40px #00f6ffff, 0 0 60px #00f6ff55 inset;
+}
+
+canvas{
+  display:block;
+  background:
+    linear-gradient(#00f6ff14 1px,transparent 1px),
+    linear-gradient(90deg,#00f6ff14 1px,transparent 1px),
+    #040714;
+  background-size:40px 40px;
+  cursor:grab;
+}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="hud-section">Balance: $<span id="bal">10000</span></div>
+  <div class="hud-section">Price: $<span id="price">100</span></div>
+
+  <div class="hud-section">
+    Buy Amount: <input type="number" id="buyAmt" value="100" min="1">
+    <button onclick="buy()">BUY</button>
+  </div>
+
+  <div class="hud-section">
+    Sell Index: <input type="number" id="sellIndex" value="0" min="0">
+    Sell Amount: <input type="number" id="sellAmt" value="100" min="1">
+    <button onclick="sell()">SELL</button>
+  </div>
+</div>
+
+<canvas id="chart"></canvas>
+
+<script>
+const canvas=document.getElementById("chart");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight - document.getElementById("hud").offsetHeight;
+}
+resize();
+window.onresize=resize;
+
+/* PAN + ZOOM */
+let offsetX=0, scaleX=1, dragging=false, lastX=0;
+canvas.addEventListener("mousedown",e=>{dragging=true; lastX=e.clientX; canvas.style.cursor='grabbing';});
+canvas.addEventListener("mousemove",e=>{if(dragging){offsetX+=e.clientX-lastX; lastX=e.clientX;}});
+canvas.addEventListener("mouseup",e=>{dragging=false; canvas.style.cursor='grab';});
+canvas.addEventListener("mouseleave",e=>{dragging=false; canvas.style.cursor='grab';});
+canvas.addEventListener("touchstart",e=>{dragging=true; lastX=e.touches[0].clientX;});
+canvas.addEventListener("touchmove",e=>{if(dragging){offsetX+=e.touches[0].clientX-lastX; lastX=e.touches[0].clientX;}});
+canvas.addEventListener("touchend",e=>{dragging=false;});
+
+// Wheel Zoom
+canvas.addEventListener("wheel", e=>{
+  e.preventDefault();
+  let mouseX=e.clientX;
+  let oldScale=scaleX;
+  scaleX+=-e.deltaY*0.0015;
+  scaleX=Math.max(0.5, Math.min(scaleX,3));
+  offsetX=(offsetX-mouseX)*(scaleX/oldScale)+mouseX;
+});
+
+/* GAME STATE */
+let balance=10000;
+let positions=[];
+let price=100;
+let volatility=0.002;
+let trend=0;
+let candles=[];
+const MAX=120;
+
+/* VOLATILITY */
+function updateVolatility(){
+  volatility+=(Math.random()-0.5)*0.00012;
+  volatility=Math.max(0.0006, Math.min(volatility,0.012));
+}
+
+/* MARKET ENGINE */
+function newCandle(){
+  updateVolatility();
+  let open=price, high=open, low=open, close=open;
+  for(let i=0;i<12;i++){
+    let move=(Math.random()-0.5)*price*volatility;
+    close+=move+trend*price;
+    high=Math.max(high,close);
+    low=Math.min(low,close);
+  }
+  if(Math.random()<0.01) trend=(Math.random()-0.5)*0.004;
+  trend*=0.995;
+  price=Math.max(1,close);
+  candles.push({open,high,low,close});
+  if(candles.length>MAX) candles.shift();
+  offsetX-=(canvas.width/MAX)*scaleX;
+  document.getElementById("price").innerText=price.toFixed(2);
+}
+
+/* DRAW */
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(candles.length<2) return;
+  let max=Math.max(...candles.map(c=>c.high));
+  let min=Math.min(...candles.map(c=>c.low));
+  let range=max-min;
+  let baseWidth=canvas.width/MAX;
+
+  candles.forEach((c,i)=>{
+    let w=baseWidth*scaleX;
+    let x=i*w + w/2 + offsetX;
+    if(x<-w || x>canvas.width+w) return;
+    let yO=canvas.height-(c.open-min)/range*canvas.height;
+    let yC=canvas.height-(c.close-min)/range*canvas.height;
+    let yH=canvas.height-(c.high-min)/range*canvas.height;
+    let yL=canvas.height-(c.low-min)/range*canvas.height;
+
+    ctx.strokeStyle="#9ff";
+    ctx.beginPath();
+    ctx.moveTo(x,yH);
+    ctx.lineTo(x,yL);
+    ctx.stroke();
+
+    ctx.shadowBlur=16;
+    ctx.shadowColor=c.close>=c.open?"#00ff9c":"#ff3b6f";
+    ctx.fillStyle=c.close>=c.open?"#00ff9c":"#ff3b6f";
+    ctx.fillRect(x-w*0.28,Math.min(yO,yC),w*0.56,Math.abs(yC-yO)+1);
+    ctx.shadowBlur=0;
+  });
+}
+
+/* TRADING */
+function buy(){
+  let amt=parseFloat(document.getElementById("buyAmt").value);
+  if(isNaN(amt)||amt<=0||amt>balance){alert("Invalid buy amount"); return;}
+  positions.push({price:price, amount:amt});
+  balance-=amt;
+  document.getElementById("bal").innerText=balance.toFixed(2);
+}
+
+function sell(){
+  if(positions.length===0){alert("No positions"); return;}
+  let idx=parseInt(document.getElementById("sellIndex").value);
+  if(isNaN(idx)||idx<0||idx>=positions.length){alert("Invalid index"); return;}
+  let amt=parseFloat(document.getElementById("sellAmt").value);
+  if(isNaN(amt)||amt<=0||amt>positions[idx].amount){alert("Invalid amount"); return;}
+  let pnl=(price>positions[idx].price?amt:-amt);
+  balance+=amt+pnl;
+  positions[idx].amount-=amt;
+  if(positions[idx].amount<=0) positions.splice(idx,1);
+  document.getElementById("bal").innerText=balance.toFixed(2);
+}
+
+/* LOOP */
+setInterval(()=>{newCandle(); draw();},700);
+</script>
+
+</body>
+</html>
